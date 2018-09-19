@@ -45,6 +45,7 @@ void MainWindow::paintEvent(QPaintEvent *e) {
     drawStarField();
     drawTies();
     drawExplosions();
+    drawCrossHairs();
 }
 
 void MainWindow::createStarField() {
@@ -255,9 +256,9 @@ void MainWindow::drawExplosions() {
             p2_per.y = VIEW_DISTANCE * explosions[index].p2[edge].y / explosions[index].p2[edge].z;
 
             int p1_screen_x = WINDOW_WIDTH/2 + p1_per.x;
-            int p1_screen_y = WINDOW_WIDTH/2 + p1_per.y;
+            int p1_screen_y = WINDOW_HEIGHT/2 + p1_per.y;
             int p2_screen_x = WINDOW_WIDTH/2 + p2_per.x;
-            int p2_Screen_y = WINDOW_WIDTH/2 + p2_per.y;
+            int p2_Screen_y = WINDOW_HEIGHT/2 + p2_per.y;
 
             drawLine(p1_screen_x, p1_screen_y, p2_screen_x, p2_Screen_y, Qt::green);
         }
@@ -273,6 +274,54 @@ bool MainWindow::eventFilter( QObject* object, QEvent* event) {
                 startExplosion(index);
             }
         }
+        if (keyEvent->key() == Qt::Key_Right) {
+            cross_x += CROSS_VEL;
+            if (cross_x > WINDOW_WIDTH/2) {
+                cross_x = -WINDOW_WIDTH/2;
+            }
+        } else if (keyEvent->key() == Qt::Key_Left) {
+            cross_x -= CROSS_VEL;
+            if (cross_x < -WINDOW_WIDTH/2) {
+                cross_x = WINDOW_WIDTH/2;
+            }
+        }
+        if (keyEvent->key() == Qt::Key_Down) {
+            cross_y -= CROSS_VEL;
+            if (cross_y < -WINDOW_HEIGHT/2) {
+                cross_y = WINDOW_HEIGHT/2;
+            }
+        } else if (keyEvent->key() == Qt::Key_Up) {
+            cross_y += CROSS_VEL;
+            if (cross_y > WINDOW_HEIGHT/2) {
+                cross_y = -WINDOW_HEIGHT/2;
+            }
+        }
     }
     }
+}
+
+void MainWindow::drawCrossHairs() {
+    int cross_x_screen = WINDOW_WIDTH/2 + cross_x;
+    int cross_y_screen = WINDOW_HEIGHT/2 - cross_y;
+    drawLine(cross_x_screen - 16,
+             cross_y_screen,
+             cross_x_screen + 16,
+             cross_y_screen,
+             Qt::red);
+    drawLine(cross_x_screen,
+             cross_y_screen - 16,
+             cross_x_screen,
+             cross_y_screen + 16,
+             Qt::red);
+    drawLine(cross_x_screen - 16,
+             cross_y_screen - 4,
+             cross_x_screen - 16,
+             cross_y_screen + 4,
+             Qt::red);
+    drawLine(cross_x_screen + 16,
+             cross_y_screen - 4,
+             cross_x_screen + 16,
+             cross_y_screen + 4,
+             Qt::red);
+
 }

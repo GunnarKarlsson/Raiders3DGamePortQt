@@ -18,21 +18,24 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    bool eventFilter(QObject *, QEvent*);
 
 public slots:
     void doFrame();
+
+
+private:
     void createStarField();
     void createTieFighters();
     void startExplosion(int tie);
     void processExplosions();
     void drawExplosions();
-    bool eventFilter(QObject *, QEvent*);
-private:
     void initTie(int index);
     void processTies();
     void drawTies();
     void moveStarField();
     void drawStarField();
+    void drawCrossHairs();
     void drawPoint(int x, int y, QColor color);
     void drawLine(int p1x, int p1y, int p2x, int p2y, QColor color);
     Ui::MainWindow *ui;
@@ -42,6 +45,8 @@ private:
     POINT3D stars[NUM_STARS];
     EXPL explosions[NUM_EXPLOSIONS];
     int player_z_vel = 4;
+    float cross_x = 0;
+    float cross_y = 0;
 protected:
     void paintEvent(QPaintEvent *e);
 };
