@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    installEventFilter(this);
+
     QPalette pal = palette();
 
     // set black background
@@ -34,6 +36,7 @@ MainWindow::~MainWindow()
 void MainWindow::doFrame() {
     moveStarField();
     processTies();
+    processExplosions();
     update();//will trigger call to paintEvent()
 }
 
@@ -41,6 +44,7 @@ void MainWindow::doFrame() {
 void MainWindow::paintEvent(QPaintEvent *e) {
     drawStarField();
     drawTies();
+    drawExplosions();
 }
 
 void MainWindow::createStarField() {
@@ -257,5 +261,18 @@ void MainWindow::drawExplosions() {
 
             drawLine(p1_screen_x, p1_screen_y, p2_screen_x, p2_Screen_y, Qt::green);
         }
+    }
+}
+
+bool MainWindow::eventFilter( QObject* object, QEvent* event) {
+    switch(event->type()) {
+    case QEvent::KeyPress:{
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if(keyEvent->key() == Qt::Key_Space) {
+            for (int index = 0; index < NUM_TIES; index++) {
+                startExplosion(index);
+            }
+        }
+    }
     }
 }

@@ -26,7 +26,7 @@ public slots:
     void startExplosion(int tie);
     void processExplosions();
     void drawExplosions();
-
+    bool eventFilter(QObject *, QEvent*);
 private:
     void initTie(int index);
     void processTies();
