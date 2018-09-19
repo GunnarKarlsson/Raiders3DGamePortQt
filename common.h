@@ -8,8 +8,8 @@
 #define FAR_Z 2000
 #define VIEW_DISTANCE 320
 #define PLAYER_Z_VEL 8
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 960
 #define NUM_TIES 10
 #define NUM_TIE_VERTS  10
 #define NUM_TIE_EDGES 8
