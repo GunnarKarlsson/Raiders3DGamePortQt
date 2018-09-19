@@ -10,6 +10,9 @@
 #define PLAYER_Z_VEL 8
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
+#define NUM_TIES 10
+#define NUM_TIE_VERTS  10
+#define NUM_TIE_EDGES 8
 
 typedef struct POINT_TYP
 {
@@ -18,5 +21,31 @@ typedef struct POINT_TYP
     float y;
     float z;
 } POINT3D, *POINT3D_PTR;
+
+typedef struct LINE_TYP
+{
+    QColor color;
+    int v1;
+    int v2;
+} LINE3D, *LINE3D_PTR;
+
+typedef struct TIE_TYP
+{
+    int state;
+    float x;
+    float y;
+    float z;
+    float xv;
+    float yv;
+    float zv;
+} TIE, *TIE_PTR;
+
+
+typedef struct VEC3D_TYP
+{
+    float x;
+    float y;
+    float z;
+} VEC3D, *VEC3D_PTR;
 
 #endif // COMMON_H

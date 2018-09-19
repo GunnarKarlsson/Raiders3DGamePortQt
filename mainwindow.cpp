@@ -17,8 +17,9 @@ MainWindow::MainWindow(QWidget *parent) :
     setPalette(pal);
 
     createStarField();
+    createTieFighters();
 
-    ui->setupUi(this);    
+    ui->setupUi(this);
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(doFrame()));
     timer->start(20);
@@ -32,12 +33,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::doFrame() {
     moveStarField();
+    processTies();
     update();//will trigger call to paintEvent()
 }
 
 
 void MainWindow::paintEvent(QPaintEvent *e) {
     drawStarField();
+    drawTies();
 }
 
 void MainWindow::createStarField() {
@@ -51,7 +54,7 @@ void MainWindow::createStarField() {
 
 void MainWindow::moveStarField() {
     for (int index = 0; index < NUM_STARS; index++) {
-        stars[index].z -= PLAYER_Z_VEL;
+        stars[index].z -= player_z_vel;
         if (stars[index].z <= NEAR_Z) {
             stars[index].z = FAR_Z;
         }
@@ -85,24 +88,102 @@ void MainWindow::drawPoint(int x, int y, QColor color) {
     painter.drawPoint(p);
 }
 
+void MainWindow::drawLine(int p1x, int p1y, int p2x, int p2y, QColor color) {
+    QPainter painter(this);
+    QPen linePen(color);
+    painter.setPen(linePen);
+    QPoint p1;
+    p1.setX(p1x);
+    p1.setY(p1y);
+    QPoint p2;
+    p2.setX(p2x);
+    p2.setY(p2y);
+    painter.drawLine(p1, p2);
+}
+
 void MainWindow::createTieFighters() {
     // create the tie fighter model
     // the vertex list for the tie fighter
     POINT3D temp_tie_vlist[NUM_TIE_VERTS] =
-    {   { QColor::white, -40, 40, 0},   // p0
-        { QColor::white, -40, 0, 0},    // p1
-        { QColor::white, -40, -40, 0},  // p2
-        { QColor::white, -10, 0, 0},    // p3
-        { QColor::white, 0, 20, 0},     // p4
-        { QColor::white, 10, 0, 0},     // p5
-        { QColor::white, 0, -20, 0},    // p6
-        { QColor::white, 40, -40, 0},   // p7
-        { QColor::white, 40, 0, 0},     // p8
-        { QColor::white, 40, -40, 0}};  // p9
+    {   { Qt::white, -40, 40, 0},   // p0
+        { Qt::white, -40, 0, 0},    // p1
+        { Qt::white, -40, -40, 0},  // p2
+        { Qt::white, -10, 0, 0},    // p3
+        { Qt::white, 0, 20, 0},     // p4
+        { Qt::white, 10, 0, 0},     // p5
+        { Qt::white, 0, -20, 0},    // p6
+        { Qt::white, 40, 40, 0},   // p7
+        { Qt::white, 40, 0, 0},     // p8
+        { Qt::white, 40, -40, 0}};  // p9
 
-    //TODO...
+    for (int index = 0; index < NUM_TIE_VERTS; index++) {
+        tie_vlist[index] = temp_tie_vlist[index];
+    }
+
+    LINE3D temp_tie_shape[NUM_TIE_EDGES] =
+    {{Qt::green, 0, 2},
+     {Qt::green, 1, 3},
+     {Qt::green, 3, 4},
+     {Qt::green, 4, 5},
+     {Qt::green, 5, 6},
+     {Qt::green, 6, 3},
+     {Qt::green, 5, 8},
+     {Qt::green, 7, 9}};
+
+    for (int index = 0; index < NUM_TIE_EDGES; index++) {
+        tie_shape[index] = temp_tie_shape[index];
+    }
+
+    for (int index = 0; index < NUM_TIES; index++) {
+        initTie(index);
+    }
 }
 
 void MainWindow::initTie(int index) {
+    ties[index].x = -WINDOW_WIDTH + rand()%(2*WINDOW_WIDTH);
+    ties[index].y = -WINDOW_HEIGHT + rand()%(2*WINDOW_HEIGHT);
+    ties[index].z = 4*FAR_Z;
 
+    ties[index].xv = -4+rand()%8;
+    ties[index].yv = -4+rand()%8;
+    ties[index].zv = -4-rand()%64;
+
+    ties[index].state = 1;
+}
+
+void MainWindow::processTies() {
+    for (int index = 0; index < NUM_TIES; index++) {
+        if (ties[index].state == 0) {
+            continue;
+        }
+        ties[index].z += ties[index].zv;
+        ties[index].x += ties[index].xv;
+        ties[index].y += ties[index].yv;
+
+        if (ties[index].z <= NEAR_Z) {
+            initTie(index);
+        }
+    }
+}
+
+void MainWindow::drawTies() {
+    for (int index = 0; index < NUM_TIES; index++) {
+        if (ties[index].state == 0) {
+            continue;
+        }
+        for (int edge = 0; edge < NUM_TIE_EDGES; edge++) {
+            POINT3D p1_per, p2_per;
+            p1_per.x = VIEW_DISTANCE * (ties[index].x + tie_vlist[tie_shape[edge].v1].x) / (tie_vlist[tie_shape[edge].v1].z + ties[index].z);
+            p1_per.y = VIEW_DISTANCE * (ties[index].y + tie_vlist[tie_shape[edge].v1].y) / (tie_vlist[tie_shape[edge].v1].z + ties[index].z);
+            p2_per.x = VIEW_DISTANCE * (ties[index].x + tie_vlist[tie_shape[edge].v2].x) / (tie_vlist[tie_shape[edge].v2].z + ties[index].z);
+            p2_per.y = VIEW_DISTANCE * (ties[index].y + tie_vlist[tie_shape[edge].v2].y) / (tie_vlist[tie_shape[edge].v2].z + ties[index].z);
+
+            int p1_screen_x = WINDOW_WIDTH/2 + p1_per.x;
+            int p1_screen_y = WINDOW_HEIGHT/2 + p1_per.y;
+            int p2_screen_x = WINDOW_WIDTH/2 + p2_per.x;
+            int p2_screen_y = WINDOW_HEIGHT/2 + p2_per.y;
+
+            drawLine(p1_screen_x, p1_screen_y, p2_screen_x, p2_screen_y, Qt::green);
+        }
+    }
 }
