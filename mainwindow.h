@@ -23,6 +23,9 @@ public slots:
     void doFrame();
     void createStarField();
     void createTieFighters();
+    void startExplosion(int tie);
+    void processExplosions();
+    void drawExplosions();
 
 private:
     void initTie(int index);
@@ -37,6 +40,7 @@ private:
     LINE3D tie_shape[NUM_TIE_EDGES];
     TIE ties[NUM_TIES];
     POINT3D stars[NUM_STARS];
+    EXPL explosions[NUM_EXPLOSIONS];
     int player_z_vel = 4;
 protected:
     void paintEvent(QPaintEvent *e);

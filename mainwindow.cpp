@@ -187,3 +187,75 @@ void MainWindow::drawTies() {
         }
     }
 }
+
+void MainWindow::startExplosion(int tie) {
+    for (int index = 0; index < NUM_EXPLOSIONS; index++) {
+        if (explosions[index].state == 0) {
+            explosions[index].state = 1;
+            explosions[index].counter = 0;
+            explosions[index].color = Qt::green;
+            for (int edge = 0; edge < NUM_TIE_EDGES; edge++) {
+                explosions[index].p1[edge].x = ties[tie].x + tie_vlist[tie_shape[edge].v1].x;
+                explosions[index].p1[edge].y = ties[tie].y + tie_vlist[tie_shape[edge].v1].y;
+                explosions[index].p1[edge].z = ties[tie].z + tie_vlist[tie_shape[edge].v1].z;
+
+                explosions[index].p2[edge].x = ties[tie].x + tie_vlist[tie_shape[edge].v2].x;
+                explosions[index].p2[edge].y = ties[tie].y + tie_vlist[tie_shape[edge].v2].y;
+                explosions[index].p2[edge].z = ties[tie].z + tie_vlist[tie_shape[edge].v2].z;
+
+                explosions[index].vel[edge].x = ties[tie].xv - 8+rand()%16;
+                explosions[index].vel[edge].y = ties[tie].yv - 8+rand()%16;
+                explosions[index].vel[edge].z = -3 + rand()%4;
+            }
+        }
+    }
+}
+
+void MainWindow::processExplosions() {
+    for (int index = 0; index < NUM_EXPLOSIONS; index++) {
+        if (explosions[index].state == 0) {
+            continue;
+        }
+        for (int edge = 0; edge < NUM_TIE_EDGES; edge++) {
+            explosions[index].p1[edge].x += explosions[index].vel[edge].x;
+            explosions[index].p1[edge].y += explosions[index].vel[edge].y;
+            explosions[index].p1[edge].z += explosions[index].vel[edge].z;
+
+            explosions[index].p2[edge].x += explosions[index].vel[edge].x;
+            explosions[index].p2[edge].y += explosions[index].vel[edge].y;
+            explosions[index].p2[edge].z += explosions[index].vel[edge].z;
+        }
+
+        if (++explosions[index].counter > 100) {
+            explosions[index].state = explosions[index].counter = 0;
+        }
+    }
+}
+
+void MainWindow::drawExplosions() {
+    for (int index = 0; index < NUM_EXPLOSIONS; index++) {
+        if (explosions[index].state == 0) {
+            continue;
+        }
+
+        for (int edge = 0; edge < NUM_TIE_EDGES; edge++) {
+            POINT3D p1_per, p2_per;
+
+            if (explosions[index].p1[edge].z < NEAR_Z && explosions[index].p2[edge].z < NEAR_Z) {
+                continue;
+            }
+
+            p1_per.x = VIEW_DISTANCE * explosions[index].p1[edge].x / explosions[index].p1[edge].z;
+            p1_per.y = VIEW_DISTANCE * explosions[index].p1[edge].y / explosions[index].p1[edge].z;
+            p2_per.x = VIEW_DISTANCE * explosions[index].p2[edge].x / explosions[index].p2[edge].z;
+            p2_per.y = VIEW_DISTANCE * explosions[index].p2[edge].y / explosions[index].p2[edge].z;
+
+            int p1_screen_x = WINDOW_WIDTH/2 + p1_per.x;
+            int p1_screen_y = WINDOW_WIDTH/2 + p1_per.y;
+            int p2_screen_x = WINDOW_WIDTH/2 + p2_per.x;
+            int p2_Screen_y = WINDOW_WIDTH/2 + p2_per.y;
+
+            drawLine(p1_screen_x, p1_screen_y, p2_screen_x, p2_Screen_y, Qt::green);
+        }
+    }
+}
