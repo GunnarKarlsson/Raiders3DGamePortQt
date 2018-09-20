@@ -34,6 +34,19 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::doFrame() {
+
+    if (cannon_state == 1) {
+        if (++cannon_count > 15) {
+            cannon_state = 2;
+        }
+    }
+
+    if (cannon_state == 2) {
+        if (++cannon_count > 20) {
+            cannon_state = 0;
+        }
+    }
+
     moveStarField();
     processTies();
     processExplosions();
@@ -46,6 +59,7 @@ void MainWindow::paintEvent(QPaintEvent *e) {
     drawTies();
     drawExplosions();
     drawCrossHairs();
+    drawLaserBeams();
 }
 
 void MainWindow::createStarField() {
@@ -81,6 +95,23 @@ void MainWindow::drawStarField() {
         }
     }
     update();
+}
+
+void MainWindow::drawLaserBeams() {
+    if (cannon_state == 1) {
+        int x = WINDOW_WIDTH/2 + target_x_screen;
+        int y = WINDOW_HEIGHT/2 -  target_y_screen;
+        if (rand()%2 == 1) {
+            drawLine(WINDOW_WIDTH - 1, WINDOW_HEIGHT - 1,
+                     -4+rand()%8+x,
+                     -4+rand()%8+y,
+                     Qt::yellow);
+        } else {
+            drawLine(0, WINDOW_HEIGHT-1,
+                     -4+rand()%8+x, -4+rand()%8+y,
+                     Qt::yellow);
+        }
+    }
 }
 
 void MainWindow::drawPoint(int x, int y, QColor color) {
@@ -269,10 +300,12 @@ bool MainWindow::eventFilter( QObject* object, QEvent* event) {
     switch(event->type()) {
     case QEvent::KeyPress:{
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if(keyEvent->key() == Qt::Key_Space) {
-            for (int index = 0; index < NUM_TIES; index++) {
-                startExplosion(index);
-            }
+        if(keyEvent->key() == Qt::Key_Space && cannon_state == 0) {
+            cannon_state = 1;
+            cannon_count = 0;
+
+            target_x_screen = cross_x;
+            target_y_screen = cross_y;
         }
         if (keyEvent->key() == Qt::Key_Right) {
             cross_x += CROSS_VEL;

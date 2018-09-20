@@ -36,6 +36,7 @@ private:
     void moveStarField();
     void drawStarField();
     void drawCrossHairs();
+    void drawLaserBeams();
     void drawPoint(int x, int y, QColor color);
     void drawLine(int p1x, int p1y, int p2x, int p2y, QColor color);
     Ui::MainWindow *ui;
@@ -47,6 +48,12 @@ private:
     int player_z_vel = 4;
     float cross_x = 0;
     float cross_y = 0;
+    float cross_x_screen;
+    float cross_y_screen;
+    int cannon_state;
+    int cannon_count;
+    float target_x_screen;
+    float target_y_screen;
 protected:
     void paintEvent(QPaintEvent *e);
 };
