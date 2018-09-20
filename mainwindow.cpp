@@ -203,10 +203,20 @@ void MainWindow::processTies() {
 }
 
 void MainWindow::drawTies() {
+
+    int bmin_x, bmin_y, bmax_x, bmax_y;
+
     for (int index = 0; index < NUM_TIES; index++) {
         if (ties[index].state == 0) {
             continue;
         }
+
+        bmin_x = 100000;
+        bmax_x = -100000;
+        bmin_y = 100000;
+        bmax_y = -100000;
+
+        bool hasInitialValue = false;
         for (int edge = 0; edge < NUM_TIE_EDGES; edge++) {
             POINT3D p1_per, p2_per;
             p1_per.x = VIEW_DISTANCE * (ties[index].x + tie_vlist[tie_shape[edge].v1].x) / (tie_vlist[tie_shape[edge].v1].z + ties[index].z);
@@ -220,7 +230,67 @@ void MainWindow::drawTies() {
             int p2_screen_y = WINDOW_HEIGHT/2 + p2_per.y;
 
             drawLine(p1_screen_x, p1_screen_y, p2_screen_x, p2_screen_y, Qt::green);
+
+            int min_x = std::min(p1_screen_x, p2_screen_x);
+            int max_x = std::max(p1_screen_x, p2_screen_x);
+            int min_y = std::min(p1_screen_y, p2_screen_y);
+            int max_y = std::max(p1_screen_y, p2_screen_y);
+
+            if (!hasInitialValue) {
+                hasInitialValue = true;
+                bmin_x = min_x;
+                bmin_y = min_y;
+                bmax_x = max_x;
+                bmax_y = max_y;
+            }
+
+            bmin_x = std::min(bmin_x, min_x);
+            bmin_y = std::min(bmin_y, min_y);
+
+            bmax_x = std::max(bmax_x, max_x);
+            bmax_y = std::max(bmax_y, max_y);
         }
+        //if (cannon_state == 1) {
+
+
+        //debug rect
+        int v = 10;
+        bmin_x -= v;
+        bmin_y -= v;
+        bmax_x += v;
+        bmax_y += v;
+        drawLine(bmin_x, bmin_y, bmin_x, bmax_y, Qt::yellow);//LT -> LB
+        drawLine(bmax_x, bmin_y, bmax_x, bmax_y, Qt::yellow);//RT -> RB
+        drawLine(bmin_x, bmin_y, bmax_x, bmin_y, Qt::yellow);//LT -> RT
+        drawLine(bmin_x, bmax_y, bmax_x, bmax_y, Qt::yellow);//LB -> RB
+
+        //drawLine(bmin_x, bmin_y, bmax_x, bmax_y, Qt::yellow);
+
+        bmin_x -= WINDOW_WIDTH/2;
+        bmax_x -= WINDOW_WIDTH/2;
+        bmin_y -= WINDOW_HEIGHT/2;
+        bmax_y -= WINDOW_HEIGHT/2;
+        //int y = target_y_screen - WINDOW_HEIGHT/2;
+
+        //qDebug() << "target_x_screen:" << target_x_screen << "> bmin_x: " << bmin_x << endl;
+        //qDebug() << "target_x_screen:" << target_x_screen << "< bmax_x: " << bmax_x << endl;
+
+        bool insideX = target_x_screen > bmin_x && target_x_screen < bmax_x;
+        bool insideY = target_y_screen > bmin_y && target_y_screen < bmax_y;
+
+        if (insideX && insideY) {
+            qDebug() << "hit! index " << index << endl;
+        }
+
+        if (cannon_state == 1) {
+            if (target_x_screen > bmin_x && target_x_screen < bmax_x &&
+                    target_y_screen > bmin_y && target_y_screen < bmax_y) {
+                //qDebug() << "hit!" << endl;
+                startExplosion(index);
+                initTie(index);
+            }
+        }
+        //}
     }
 }
 
