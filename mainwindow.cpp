@@ -295,6 +295,13 @@ bool MainWindow::eventFilter( QObject* object, QEvent* event) {
             if (cross_y > WINDOW_HEIGHT/2) {
                 cross_y = -WINDOW_HEIGHT/2;
             }
+        } else if (keyEvent->key() == Qt::Key_W) {
+            player_z_vel++;
+        } else if (keyEvent->key() == Qt::Key_S) {
+            player_z_vel--;
+            if (player_z_vel < 0) {
+                player_z_vel = 0;
+            }
         }
     }
     }
