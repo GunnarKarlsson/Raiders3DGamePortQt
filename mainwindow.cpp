@@ -444,5 +444,4 @@ void MainWindow::drawCrossHairs() {
              cross_x_screen + 16,
              cross_y_screen + 4,
              Qt::red);
-
 }
