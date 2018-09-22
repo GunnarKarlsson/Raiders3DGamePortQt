@@ -58,6 +58,7 @@ private:
     int misses = 0;
     int hits = 0;
     int score = 0;
+    int game_state;
 protected:
     void paintEvent(QPaintEvent *e);
 };

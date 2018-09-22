@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(doFrame()));
     timer->start(20);
+
+    game_state = GAME_RUNNING;
 }
 
 MainWindow::~MainWindow()
@@ -42,6 +44,10 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::doFrame() {
+
+    if (game_state != GAME_RUNNING) {
+        return;
+    }
 
     if (cannon_state == 1) {
         if (++cannon_count > 15) {
@@ -59,6 +65,9 @@ void MainWindow::doFrame() {
     processTies();
     processExplosions();
     update();//will trigger call to paintEvent()
+    if (misses >= 100) {
+        game_state = GAME_OVER;
+    }
 }
 
 
@@ -66,10 +75,15 @@ void MainWindow::paintEvent(QPaintEvent *e) {
     drawStarField();
     drawTies();
     drawExplosions();
-    drawCrossHairs();
-    drawLaserBeams();
+    if (game_state !=  GAME_OVER) {
+        drawCrossHairs();
+        drawLaserBeams();
+    }
     QString text = QString("Score %1    Kills %2     Escaped %3").arg(QString::number(score), QString::number(hits), QString::number(misses));
     drawText(text, 10, 30, Qt::white);
+    if (game_state == GAME_OVER) {
+        drawText("G A M E  O V E R", 10, 60, Qt::white);
+    }
 }
 
 void MainWindow::createStarField() {
@@ -195,9 +209,9 @@ void MainWindow::initTie(int index) {
     ties[index].y = -WINDOW_HEIGHT + rand()%(2*WINDOW_HEIGHT);
     ties[index].z = 4*FAR_Z;
 
-    ties[index].xv = -1+rand()%2;
-    ties[index].yv = -1+rand()%2;
-    ties[index].zv = -1-rand()%2;
+    ties[index].xv = -4+rand()%8;
+    ties[index].yv = -4+rand()%8;
+    ties[index].zv = -4-rand()%64;
 
     ties[index].state = 1;
 }
@@ -273,11 +287,6 @@ void MainWindow::drawTies() {
         bmin_y -= v;
         bmax_x += v;
         bmax_y += v;
-
-        drawLine(bmin_x, bmin_y, bmin_x, bmax_y, Qt::yellow);//LT -> LB
-        drawLine(bmax_x, bmin_y, bmax_x, bmax_y, Qt::yellow);//RT -> RB
-        drawLine(bmin_x, bmin_y, bmax_x, bmin_y, Qt::yellow);//LT -> RT
-        drawLine(bmin_x, bmax_y, bmax_x, bmax_y, Qt::yellow);//LB -> RB
 
         bool insideX = target_x_screen > bmin_x && target_x_screen < bmax_x;
         bool insideY = target_y_screen > bmin_y && target_y_screen < bmax_y;
