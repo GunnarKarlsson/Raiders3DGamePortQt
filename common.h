@@ -21,6 +21,8 @@
 
 #define NUM_EXPLOSIONS (NUM_TIES)
 
+#define HIT_AREA 10
+
 #define GAME_RUNNING 1
 #define GAME_OVER 0
 

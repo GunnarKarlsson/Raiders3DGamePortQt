@@ -281,12 +281,12 @@ void MainWindow::drawTies() {
             bmax_y = std::max(bmax_y, max_y);
         }
 
-        //debug rect
-        int v = 5;
-        bmin_x -= v;
-        bmin_y -= v;
-        bmax_x += v;
-        bmax_y += v;
+        //Larger hit area
+
+        bmin_x -= HIT_AREA/2;
+        bmin_y -= HIT_AREA/2;
+        bmax_x += HIT_AREA/2;
+        bmax_y += HIT_AREA/2;
 
         bool insideX = target_x_screen > bmin_x && target_x_screen < bmax_x;
         bool insideY = target_y_screen > bmin_y && target_y_screen < bmax_y;
