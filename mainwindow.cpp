@@ -107,16 +107,14 @@ void MainWindow::drawStarField() {
 
 void MainWindow::drawLaserBeams() {
     if (cannon_state == 1) {
-        int x = WINDOW_WIDTH/2 + target_x_screen;
-        int y = WINDOW_HEIGHT/2 -  target_y_screen;
         if (rand()%2 == 1) {
             drawLine(WINDOW_WIDTH - 1, WINDOW_HEIGHT - 1,
-                     -4+rand()%8+x,
-                     -4+rand()%8+y,
+                     -4+rand()%8+target_x_screen,
+                     -4+rand()%8+target_y_screen,
                      Qt::yellow);
         } else {
             drawLine(0, WINDOW_HEIGHT-1,
-                     -4+rand()%8+x, -4+rand()%8+y,
+                     -4+rand()%8+target_x_screen, -4+rand()%8+target_y_screen,
                      Qt::yellow);
         }
     }
