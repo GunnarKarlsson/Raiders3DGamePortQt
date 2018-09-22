@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QPalette pal = palette();
 
-    // set black background
     pal.setColor(QPalette::Background, Qt::black);
     setAutoFillBackground(true);
     setPalette(pal);
@@ -283,7 +282,6 @@ void MainWindow::drawTies() {
         }
 
         //Larger hit area
-
         bmin_x -= HIT_AREA/2;
         bmin_y -= HIT_AREA/2;
         bmax_x += HIT_AREA/2;
@@ -308,7 +306,6 @@ void MainWindow::drawTies() {
 void MainWindow::startExplosion(int tie) {
     for (int index = 0; index < NUM_EXPLOSIONS; index++) {
         if (explosions[index].state == 0) {
-            //qDebug() << "adding new explosion at index: " << index << "at time " << QDateTime::currentMSecsSinceEpoch() ;
             explosions[index].state = 1;
             explosions[index].counter = 0;
             explosions[index].color = Qt::green;
