@@ -389,6 +389,8 @@ bool MainWindow::eventFilter( QObject* object, QEvent* event) {
 
             target_x_screen = cross_x_screen;
             target_y_screen = cross_y_screen;
+            QSound::play(":/sound/SHOCKER.wav");
+
         }
         if (keyEvent->key() == Qt::Key_Right) {
             cross_x += CROSS_VEL;
