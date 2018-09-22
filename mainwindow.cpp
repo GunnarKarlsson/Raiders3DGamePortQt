@@ -299,7 +299,6 @@ void MainWindow::drawTies() {
                 QSound::play(":/sound/EXP1.wav");
             }
         }
-
     }
 }
 
@@ -350,7 +349,7 @@ void MainWindow::processExplosions() {
 
 void MainWindow::drawExplosions() {
     for (int index = 0; index < NUM_EXPLOSIONS; index++) {
-        if (explosions[index].state == 0) {
+        if (explosions[index].state != 1) {
             continue;
         }
 
