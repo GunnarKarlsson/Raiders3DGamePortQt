@@ -68,6 +68,8 @@ void MainWindow::paintEvent(QPaintEvent *e) {
     drawExplosions();
     drawCrossHairs();
     drawLaserBeams();
+    QString text = QString("Score %1    Kills %2     Escaped %3").arg(QString::number(score), QString::number(hits), QString::number(misses));
+    drawText(text, 10, 30, Qt::white);
 }
 
 void MainWindow::createStarField() {
@@ -143,6 +145,13 @@ void MainWindow::drawLine(int p1x, int p1y, int p2x, int p2y, QColor color) {
     painter.drawLine(p1, p2);
 }
 
+void MainWindow::drawText(QString text, int x, int y, QColor color) {
+    QPainter painter(this);
+    painter.setPen(color);
+    painter.drawText(x, y, text);
+}
+
+
 void MainWindow::createTieFighters() {
     // create the tie fighter model
     // the vertex list for the tie fighter
@@ -204,6 +213,7 @@ void MainWindow::processTies() {
 
         if (ties[index].z <= NEAR_Z) {
             initTie(index);
+            misses++;
         }
     }
 }
@@ -275,6 +285,8 @@ void MainWindow::drawTies() {
         if (cannon_state == 1) {
             if (insideX && insideY) {
                 startExplosion(index);
+                score+=ties[index].z;
+                hits++;
                 initTie(index);
             }
         }

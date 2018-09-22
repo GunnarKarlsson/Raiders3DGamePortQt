@@ -39,6 +39,7 @@ private:
     void drawLaserBeams();
     void drawPoint(int x, int y, QColor color);
     void drawLine(int p1x, int p1y, int p2x, int p2y, QColor color);
+    void drawText(QString text, int x, int y, QColor color);
     Ui::MainWindow *ui;
     POINT3D tie_vlist[NUM_TIE_VERTS];
     LINE3D tie_shape[NUM_TIE_EDGES];
@@ -54,6 +55,9 @@ private:
     int cannon_count;
     float target_x_screen;
     float target_y_screen;
+    int misses = 0;
+    int hits = 0;
+    int score = 0;
 protected:
     void paintEvent(QPaintEvent *e);
 };
