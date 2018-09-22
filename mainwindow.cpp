@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QDateTime>
+#include <QSound>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -297,6 +298,7 @@ void MainWindow::drawTies() {
                 score+=ties[index].z;
                 hits++;
                 initTie(index);
+                QSound::play(":/sound/EXP1.wav");
             }
         }
 
