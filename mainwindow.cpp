@@ -4,6 +4,7 @@
 #include <QPen>
 #include <QTimer>
 #include <QDebug>
+#include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,6 +18,13 @@ MainWindow::MainWindow(QWidget *parent) :
     pal.setColor(QPalette::Background, Qt::black);
     setAutoFillBackground(true);
     setPalette(pal);
+
+    cross_x = 0;
+    cross_y = 0;
+    cross_x_screen = WINDOW_WIDTH/2;
+    cross_y_screen = WINDOW_HEIGHT/2;
+    target_x_screen = WINDOW_WIDTH/2;
+    target_y_screen = WINDOW_HEIGHT/2;
 
     createStarField();
     createTieFighters();
@@ -180,9 +188,9 @@ void MainWindow::initTie(int index) {
     ties[index].y = -WINDOW_HEIGHT + rand()%(2*WINDOW_HEIGHT);
     ties[index].z = 4*FAR_Z;
 
-    ties[index].xv = -4+rand()%8;
-    ties[index].yv = -4+rand()%8;
-    ties[index].zv = -4-rand()%64;
+    ties[index].xv = -1+rand()%2;
+    ties[index].yv = -1+rand()%2;
+    ties[index].zv = -1-rand()%2;
 
     ties[index].state = 1;
 }
@@ -250,53 +258,36 @@ void MainWindow::drawTies() {
             bmax_x = std::max(bmax_x, max_x);
             bmax_y = std::max(bmax_y, max_y);
         }
-        //if (cannon_state == 1) {
-
 
         //debug rect
-        int v = 10;
+        int v = 5;
         bmin_x -= v;
         bmin_y -= v;
         bmax_x += v;
         bmax_y += v;
+
         drawLine(bmin_x, bmin_y, bmin_x, bmax_y, Qt::yellow);//LT -> LB
         drawLine(bmax_x, bmin_y, bmax_x, bmax_y, Qt::yellow);//RT -> RB
         drawLine(bmin_x, bmin_y, bmax_x, bmin_y, Qt::yellow);//LT -> RT
         drawLine(bmin_x, bmax_y, bmax_x, bmax_y, Qt::yellow);//LB -> RB
 
-        //drawLine(bmin_x, bmin_y, bmax_x, bmax_y, Qt::yellow);
-
-        bmin_x -= WINDOW_WIDTH/2;
-        bmax_x -= WINDOW_WIDTH/2;
-        bmin_y -= WINDOW_HEIGHT/2;
-        bmax_y -= WINDOW_HEIGHT/2;
-        //int y = target_y_screen - WINDOW_HEIGHT/2;
-
-        //qDebug() << "target_x_screen:" << target_x_screen << "> bmin_x: " << bmin_x << endl;
-        //qDebug() << "target_x_screen:" << target_x_screen << "< bmax_x: " << bmax_x << endl;
-
         bool insideX = target_x_screen > bmin_x && target_x_screen < bmax_x;
         bool insideY = target_y_screen > bmin_y && target_y_screen < bmax_y;
 
-        if (insideX && insideY) {
-            qDebug() << "hit! index " << index << endl;
-        }
-
         if (cannon_state == 1) {
-            if (target_x_screen > bmin_x && target_x_screen < bmax_x &&
-                    target_y_screen > bmin_y && target_y_screen < bmax_y) {
-                //qDebug() << "hit!" << endl;
+            if (insideX && insideY) {
                 startExplosion(index);
                 initTie(index);
             }
         }
-        //}
+
     }
 }
 
 void MainWindow::startExplosion(int tie) {
     for (int index = 0; index < NUM_EXPLOSIONS; index++) {
         if (explosions[index].state == 0) {
+            //qDebug() << "adding new explosion at index: " << index << "at time " << QDateTime::currentMSecsSinceEpoch() ;
             explosions[index].state = 1;
             explosions[index].counter = 0;
             explosions[index].color = Qt::green;
@@ -313,6 +304,7 @@ void MainWindow::startExplosion(int tie) {
                 explosions[index].vel[edge].y = ties[tie].yv - 8+rand()%16;
                 explosions[index].vel[edge].z = -3 + rand()%4;
             }
+            return;
         }
     }
 }
@@ -374,8 +366,8 @@ bool MainWindow::eventFilter( QObject* object, QEvent* event) {
             cannon_state = 1;
             cannon_count = 0;
 
-            target_x_screen = cross_x;
-            target_y_screen = cross_y;
+            target_x_screen = cross_x_screen;
+            target_y_screen = cross_y_screen;
         }
         if (keyEvent->key() == Qt::Key_Right) {
             cross_x += CROSS_VEL;
@@ -411,8 +403,8 @@ bool MainWindow::eventFilter( QObject* object, QEvent* event) {
 }
 
 void MainWindow::drawCrossHairs() {
-    int cross_x_screen = WINDOW_WIDTH/2 + cross_x;
-    int cross_y_screen = WINDOW_HEIGHT/2 - cross_y;
+    cross_x_screen = WINDOW_WIDTH/2 + cross_x;
+    cross_y_screen = WINDOW_HEIGHT/2 - cross_y;
     drawLine(cross_x_screen - 16,
              cross_y_screen,
              cross_x_screen + 16,
