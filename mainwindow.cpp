@@ -296,7 +296,7 @@ void MainWindow::drawTies() {
                 score+=ties[index].z;
                 hits++;
                 initTie(index);
-                QSound::play(":/sound/EXP1.wav");
+                QSound::play(":/assets/EXP1.wav");
             }
         }
     }
@@ -385,7 +385,7 @@ bool MainWindow::eventFilter( QObject* object, QEvent* event) {
 
             target_x_screen = cross_x_screen;
             target_y_screen = cross_y_screen;
-            QSound::play(":/sound/SHOCKER.wav");
+            QSound::play(":/assets/SHOCKER.wav");
 
         }
         if (keyEvent->key() == Qt::Key_Right) {

@@ -1,6 +1,6 @@
 <RCC>
-    <qresource prefix="/sound">
-        <file>EXP1.wav</file>
-        <file>SHOCKER.wav</file>
+    <qresource prefix="/">
+        <file>assets/EXP1.wav</file>
+        <file>assets/SHOCKER.wav</file>
     </qresource>
 </RCC>
